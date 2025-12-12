@@ -52,21 +52,96 @@ addTaskButton.addEventListener("click", () => {
 });
 
 
+function openEditModal(index) {
+  taskToEditIndex = index;
+  editTaskInput.value = tasks[index].name;
+  editTaskModal.style.display = "block";
+}
+
+function closeEditModal() {
+  editTaskModal.style.display = "none";
+}
+
+saveEditButton.addEventListener("click", () => {
+  const updatedTaskName = editTaskInput.value.trim();
+  const result2 = document.getElementById("demo");
+
+  if (updatedTaskName === "") {
+    result2.textContent = "Task cannot be empty.";
+    result2.style.color = "red";
+    return;
+  }
+  if (updatedTaskName.length < 5) {
+    result2.textContent = "Task must be at least 5 characters long.";
+    result2.style.color = "red";
+    return;
+  }
+  if (/^\d/.test(updatedTaskName)) {
+    result2.textContent = "Task cannot start with a number.";
+    result2.style.color = "red";
+    return;
+  }
+
+  tasks[taskToEditIndex].name = updatedTaskName;
+  saveTasks();
+  updateList();
+  closeEditModal();
+});
+
+closeEditModalButton.addEventListener("click", closeEditModal);
+
+window.addEventListener("click", (event) => {
+  if (event.target === editTaskModal) closeEditModal();
+});
 
 
+function showDeleteModal(action) {
+  deleteModal.style.display = "block";
+
+  if (action === "single")
+    deleteModalText.textContent = "Are you sure you want to delete this task?";
+  else if (action === "all")
+    deleteModalText.textContent = "Are you sure you want to delete all tasks?";
+  else if (action === "done")
+    deleteModalText.textContent =
+      "Are you sure you want to delete all completed tasks?";
+}
+
+function closeDeleteModal() {
+  deleteModal.style.display = "none";
+}
+
+cancelDeleteButton.addEventListener("click", closeDeleteModal);
+
+window.addEventListener("click", (event) => {
+  if (event.target === deleteModal) closeDeleteModal();
+});
 
 
+deleteAllButton.addEventListener("click", () => {
+  deleteAction = "all";
+  showDeleteModal(deleteAction);
+});
+
+deleteDoneButton.addEventListener("click", () => {
+  deleteAction = "done";
+  showDeleteModal(deleteAction);
+});
 
 
+confirmDeleteButton.addEventListener("click", () => {
+  if (deleteAction === "all") {
+    tasks = [];
+  } else if (deleteAction === "done") {
+    tasks = tasks.filter((task) => !task.done);
+  } else if (taskToDeleteIndex !== null) {
+    tasks.splice(taskToDeleteIndex, 1);
+  }
 
-
-
-
-
-
-
-
-
+  saveTasks();
+  updateList();
+  closeDeleteModal();
+});
 
 
 function updateList(filter = "all") {
